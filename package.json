@@ -1,0 +1,23 @@
+{
+  "name": "nightshift-survive-the-midnight",
+  "private": true,
+  "version": "1.0.0",
+  "description": "NIGHTSHIFT: Survive the Midnight — Photorealistic Midnight Rain Highway Racing Game in WebGL2",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5173",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4173",
+    "test:e2e": "node scripts/verify_game.mjs"
+  },
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.14.0",
+    "three": "^0.174.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.174.0",
+    "playwright": "^1.51.0",
+    "typescript": "^5.7.3",
+    "vite": "^6.2.0"
+  }
+}

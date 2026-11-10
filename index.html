@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="description" content="NIGHTSHIFT: Survive the Midnight — High-speed photorealistic midnight rain highway racing in your browser." />
+    <meta name="theme-color" content="#05080d" />
+    <title>NIGHTSHIFT — Survive the Midnight</title>
+    <link rel="stylesheet" href="/src/styles/ui.css" />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="game-canvas" aria-label="NIGHTSHIFT 3D Highway View"></canvas>
+
+      <!-- BOOT / ASSET LOADING OVERLAY -->
+      <div id="loading-overlay" class="overlay active">
+        <div class="loading-inner">
+          <div class="brand-kicker">MIDNIGHT HIGHWAY SIMULATION</div>
+          <h1 class="brand-title">NIGHTSHIFT</h1>
+          <p class="brand-subtitle">Survive the Midnight</p>
+          <div class="loading-bar-track">
+            <div id="loading-bar-fill" class="loading-bar-fill"></div>
+          </div>
+          <div id="loading-status" class="loading-status">Initializing WebGL2 PBR Pipeline...</div>
+        </div>
+      </div>
+
+      <!-- MAIN MENU OVERLAY (Live 3D Showcase Background) -->
+      <div id="menu-overlay" class="overlay">
+        <div class="menu-layout">
+          <div class="menu-header">
+            <div class="brand-kicker">EXPRESSWAY SECTOR 09 // HEAVY RAIN WARNING</div>
+            <h1 class="brand-title">NIGHTSHIFT</h1>
+            <p class="brand-subtitle">Survive the Midnight</p>
+            <div class="menu-record">
+              <span class="record-label">BEST SCORE</span>
+              <span id="menu-best-score" class="record-value">0</span>
+            </div>
+          </div>
+
+          <nav class="menu-actions" aria-label="Main Menu">
+            <button id="btn-play" class="btn btn-primary" type="button">
+              <span class="btn-text">PLAY</span>
+              <span class="btn-hint">IGNITION</span>
+            </button>
+            <button id="btn-settings" class="btn btn-secondary" type="button">
+              <span class="btn-text">SETTINGS</span>
+              <span class="btn-hint" id="menu-quality-badge">HIGH</span>
+            </button>
+            <button id="btn-controls" class="btn btn-secondary" type="button">
+              <span class="btn-text">CONTROLS</span>
+              <span class="btn-hint">KEYMAP</span>
+            </button>
+          </nav>
+
+          <div class="menu-footer">
+            <span>W / A / S / D OR ARROWS TO DRIVE</span>
+            <span class="sep">&bull;</span>
+            <span>SHIFT NITRO</span>
+            <span class="sep">&bull;</span>
+            <span>SPACE HANDBRAKE</span>
+            <span class="sep">&bull;</span>
+            <span>C CAMERA</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS MODAL -->
+      <div id="settings-modal" class="modal-backdrop">
+        <div class="modal-card">
+          <div class="modal-header">
+            <h2>GRAPHICS &amp; AUDIO SETTINGS</h2>
+            <button id="btn-close-settings" class="btn-icon" type="button" aria-label="Close Settings">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="setting-row">
+              <div>
+                <div class="setting-title">GRAPHICS QUALITY</div>
+                <div class="setting-desc">Controls planar reflections, shadow softness, rain density &amp; bloom</div>
+              </div>
+              <div class="segmented-group" id="quality-selector">
+                <button type="button" data-quality="LOW" class="seg-btn">LOW</button>
+                <button type="button" data-quality="MEDIUM" class="seg-btn">MEDIUM</button>
+                <button type="button" data-quality="HIGH" class="seg-btn active">HIGH</button>
+                <button type="button" data-quality="ULTRA" class="seg-btn">ULTRA</button>
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <div>
+                <div class="setting-title">DYNAMIC RESOLUTION</div>
+                <div class="setting-desc">Automatically scales render resolution to sustain 60 FPS</div>
+              </div>
+              <button id="btn-toggle-drs" type="button" class="toggle-btn active">ENABLED</button>
+            </div>
+
+            <div class="setting-row">
+              <div>
+                <div class="setting-title">MASTER VOLUME</div>
+                <div class="setting-desc">Engine, rain ambience, tire hydro-spray &amp; explosion audio</div>
+              </div>
+              <div class="slider-wrap">
+                <input id="input-volume" type="range" min="0" max="100" value="80" />
+                <span id="label-volume">80%</span>
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <div>
+                <div class="setting-title">PERFORMANCE TELEMETRY</div>
+                <div class="setting-desc">Show live FPS, frame time &amp; draw call counter</div>
+              </div>
+              <button id="btn-toggle-fps" type="button" class="toggle-btn">HIDDEN</button>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="btn-save-settings" class="btn btn-primary btn-compact" type="button">APPLY &amp; CLOSE</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTROLS MODAL -->
+      <div id="controls-modal" class="modal-backdrop">
+        <div class="modal-card">
+          <div class="modal-header">
+            <h2>DRIVING CONTROLS</h2>
+            <button id="btn-close-controls" class="btn-icon" type="button" aria-label="Close Controls">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="controls-grid">
+              <div class="control-item"><kbd>W</kbd> / <kbd>&uarr;</kbd><span>Accelerate</span></div>
+              <div class="control-item"><kbd>S</kbd> / <kbd>&darr;</kbd><span>Brake / Reverse</span></div>
+              <div class="control-item"><kbd>A</kbd> <kbd>D</kbd> / <kbd>&larr;</kbd> <kbd>&rarr;</kbd><span>Precision Steering</span></div>
+              <div class="control-item"><kbd>SHIFT</kbd><span>Engage Nitro Afterburner</span></div>
+              <div class="control-item"><kbd>SPACE</kbd><span>Handbrake / Drift Initiate</span></div>
+              <div class="control-item"><kbd>C</kbd><span>Cycle Camera View (Chase / Action / Hood)</span></div>
+              <div class="control-item"><kbd>ESC</kbd><span>Pause Simulation</span></div>
+            </div>
+            <div class="controls-tip">
+              Slice closely past highway traffic above 110 km/h to chain <strong>Near Miss</strong> multipliers and recharge <strong>Nitro</strong>. Watch ahead for hazard flares, jackknifing tankers, and collapsing overpasses.
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="btn-ok-controls" class="btn btn-primary btn-compact" type="button">BACK</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- IN-GAME HUD -->
+      <div id="hud-overlay" class="hud-layer">
+        <!-- Top Left: Score, Combo, Distance, Integrity -->
+        <div class="hud-top-left">
+          <div class="hud-score-card">
+            <div class="hud-label">SCORE</div>
+            <div id="hud-score" class="hud-score-value">0</div>
+            <div class="hud-sub-row">
+              <div class="hud-stat">
+                <span class="hud-mini-label">DISTANCE</span>
+                <span id="hud-distance" class="hud-mini-val">0.00 km</span>
+              </div>
+              <div class="hud-stat">
+                <span class="hud-mini-label">NEAR MISS</span>
+                <span id="hud-nearmiss" class="hud-mini-val">0</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="hud-combo-box" class="hud-combo-card">
+            <div class="combo-top">
+              <span class="combo-label">RISK MULTIPLIER</span>
+              <span id="hud-combo" class="combo-value">x1.0</span>
+            </div>
+            <div class="combo-bar-track">
+              <div id="hud-combo-bar" class="combo-bar-fill"></div>
+            </div>
+          </div>
+
+          <div class="hud-integrity-card">
+            <div class="integrity-row">
+              <span class="hud-mini-label">CHASSIS INTEGRITY</span>
+              <span id="hud-integrity-text" class="hud-mini-val">100%</span>
+            </div>
+            <div class="integrity-track">
+              <div id="hud-integrity-fill" class="integrity-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Center: Dynamic Event Banner & Near-Miss Feed -->
+        <div class="hud-top-center">
+          <div id="hud-event-banner" class="event-banner" aria-live="polite">
+            <div id="hud-event-kicker" class="event-kicker">EMERGENCY TRAFFIC ALERT</div>
+            <div id="hud-event-title" class="event-title">HIGHWAY CHAIN REACTION AHEAD</div>
+          </div>
+          <div id="hud-callout-feed" class="callout-feed"></div>
+        </div>
+
+        <!-- Top Right: Camera / Telemetry / Pause hint -->
+        <div class="hud-top-right">
+          <div class="hud-cam-pill">
+            <span id="hud-camera-name">CHASE CAM</span>
+            <span class="pill-key">[C]</span>
+            <button id="btn-hud-pause" class="hud-pause-btn" type="button" title="Pause (ESC)">II</button>
+          </div>
+          <div id="hud-telemetry" class="hud-telemetry hidden">60 FPS &bull; 16.6 ms</div>
+        </div>
+
+        <!-- Bottom Right: Digital Cluster (Speed, Gear, RPM, Nitro) -->
+        <div class="hud-bottom-right">
+          <div class="cluster-card">
+            <div class="rpm-bar-track">
+              <div id="hud-rpm-fill" class="rpm-bar-fill"></div>
+            </div>
+            <div class="speed-cluster-main">
+              <div class="gear-box">
+                <span class="gear-label">GEAR</span>
+                <span id="hud-gear" class="gear-value">1</span>
+              </div>
+              <div class="speed-readout">
+                <span id="hud-speed" class="speed-value">000</span>
+                <span class="speed-unit">KM/H</span>
+              </div>
+            </div>
+            <div class="nitro-row">
+              <div class="nitro-header">
+                <span class="nitro-label">NITROUS OXIDE <kbd>SHIFT</kbd></span>
+                <span id="hud-nitro-pct" class="nitro-pct">100%</span>
+              </div>
+              <div class="nitro-track">
+                <div id="hud-nitro-fill" class="nitro-fill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAUSE OVERLAY -->
+      <div id="pause-overlay" class="overlay">
+        <div class="pause-card">
+          <div class="brand-kicker">SIMULATION PAUSED</div>
+          <h2 class="pause-title">NIGHTSHIFT</h2>
+          <div class="pause-actions">
+            <button id="btn-resume" class="btn btn-primary" type="button"><span class="btn-text">RESUME</span><span class="btn-hint">ESC</span></button>
+            <button id="btn-pause-restart" class="btn btn-secondary" type="button"><span class="btn-text">RESTART RUN</span><span class="btn-hint">R</span></button>
+            <button id="btn-pause-settings" class="btn btn-secondary" type="button"><span class="btn-text">SETTINGS</span></button>
+            <button id="btn-pause-menu" class="btn btn-secondary" type="button"><span class="btn-text">MAIN MENU</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAME OVER OVERLAY -->
+      <div id="gameover-overlay" class="overlay">
+        <div class="gameover-card">
+          <div class="gameover-header">
+            <div id="gameover-reason" class="gameover-kicker">CHASSIS TOTALED // MIDNIGHT EXPRESSWAY</div>
+            <h2 class="gameover-title">RUN TERMINATED</h2>
+            <div id="gameover-new-best" class="new-best-badge hidden">NEW PERSONAL RECORD</div>
+          </div>
+
+          <div class="gameover-score-hero">
+            <span class="hero-label">FINAL SCORE</span>
+            <span id="go-final-score" class="hero-value">0</span>
+          </div>
+
+          <div class="gameover-stats-grid">
+            <div class="go-stat-box">
+              <span class="go-stat-label">DISTANCE</span>
+              <span id="go-distance" class="go-stat-val">0.00 km</span>
+            </div>
+            <div class="go-stat-box">
+              <span class="go-stat-label">TOP SPEED</span>
+              <span id="go-top-speed" class="go-stat-val">0 km/h</span>
+            </div>
+            <div class="go-stat-box">
+              <span class="go-stat-label">NEAR MISSES</span>
+              <span id="go-near-misses" class="go-stat-val">0</span>
+            </div>
+            <div class="go-stat-box highlight">
+              <span class="go-stat-label">BEST SCORE</span>
+              <span id="go-best-score" class="go-stat-val">0</span>
+            </div>
+          </div>
+
+          <div class="gameover-actions">
+            <button id="btn-play-again" class="btn btn-primary" type="button">
+              <span class="btn-text">PLAY AGAIN</span>
+              <span class="btn-hint">ENTER</span>
+            </button>
+            <button id="btn-go-menu" class="btn btn-secondary" type="button">
+              <span class="btn-text">MAIN MENU</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

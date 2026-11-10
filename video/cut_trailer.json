@@ -1,0 +1,5 @@
+{
+  "_not": "take1 mutlak saniyeleri: menü+PLAY+NEAR MISS | nitro+ACTION CAM | Harbor Tunnel | Event A | ikinci zincirleme patlama | Event B | nitro ile kaza + ağır çekim + Game Over",
+  "segments": [["ABS", 1.0, 8.2], ["ABS", 10.4, 13.6], ["ABS", 16.2, 20.6], ["ABS", 24.7, 29.2], ["ABS", 31.9, 33.9], ["ABS", 36.1, 40.3], ["ABS", 43.4, 51.8]],
+  "xfade": 0.18, "fade_in": 0.6, "fade_out": 1.0
+}
