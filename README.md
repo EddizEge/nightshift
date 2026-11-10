@@ -1,6 +1,15 @@
 # NIGHTSHIFT: Survive the Midnight
 
-> **Photorealistic Midnight Rain Highway Racing in WebGL2** — Built with TypeScript, Three.js, Rapier3D WASM Physics, Planar Wet-Road Reflections, Custom PBR Shaders & Real-Time Web Audio Synthesis.
+> **Cinematic midnight rain highway racing in the browser (WebGL2)** — TypeScript, Three.js, Rapier3D WASM physics, planar wet-road reflections, custom PBR shaders and real-time Web Audio synthesis.
+
+**▶ Play:** https://eddizege.github.io/nightshift/ — desktop + keyboard only (not playable on phones). On weaker GPUs, pick LOW or MEDIUM in Settings.
+
+## How this was made
+
+This whole game was written by **Gemini 4 Carbon (High)** running as an agent in **Google Antigravity**, from **one long prompt**, in **about 73 minutes**, with **no human-written code**. The agent chose the stack, wrote every system, pulled in the open-licensed assets, ran the build and tested the game in a real browser on its own.
+
+- The trailer was captured frame by frame from this exact build (no pre-rendered footage). The driving in the trailer is an autopilot script (`video/record.mjs`), and the two set-piece events were triggered with the game's debug hook; in normal play they also fire on their own.
+- The same prompt is also being given to Claude Fable 5.2 for a side-by-side comparison (not finished yet).
 
 `NIGHTSHIFT` drops you behind the wheel of a twin-turbo midnight supercar tearing down a rain-drenched urban expressway. Slice past heavy traffic for Near-Miss multipliers, blast through Harbor Tunnel sectors, engage Nitro afterburners, and survive real-time multi-vehicle fuel tanker pileups and collapsing highway gantries.
 
