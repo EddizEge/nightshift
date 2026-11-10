@@ -10,6 +10,7 @@ This whole game was written by **Gemini 4 Carbon (High)** running as an agent in
 
 - The trailer was captured frame by frame from this exact build (no pre-rendered footage). The driving in the trailer is an autopilot script (`video/record.mjs`), and the two set-piece events were triggered with the game's debug hook; in normal play they also fire on their own.
 - The same prompt is also being given to Claude Fable 5.2 for a side-by-side comparison (not finished yet).
+- Added afterwards, not part of Gemini's output: the `video/` folder (trailer capture and editing tools, written by Claude), the GitHub Pages workflow (`.github/workflows/pages.yml`) and this "How this was made" section. Everything else (game code, assets pipeline, tests, the rest of this README, `ASSETS.md`) is Gemini's work as delivered.
 
 `NIGHTSHIFT` drops you behind the wheel of a twin-turbo midnight supercar tearing down a rain-drenched urban expressway. Slice past heavy traffic for Near-Miss multipliers, blast through Harbor Tunnel sectors, engage Nitro afterburners, and survive real-time multi-vehicle fuel tanker pileups and collapsing highway gantries.
 
