@@ -74,8 +74,8 @@ export class PlayerVehicle {
   public integrity = 100;
   public isWrecked = false;
 
-  public readonly halfWidth = 0.96;
-  public readonly halfLength = 2.26;
+  public readonly halfWidth = 1.00;
+  public readonly halfLength = 2.31;
 
   private wheels: WheelRig[] = [];
   private steeringWheelNode: THREE.Object3D | null = null;
@@ -100,7 +100,8 @@ export class PlayerVehicle {
     this.chassisTiltGroup.add(this.modelPivot);
 
     const carScene = carGltf.scene;
-    this.modelPivot.rotation.y = Math.PI;
+    // Native glTF orientation from scripts/build_player_car.py: -Z forward, +Y up, +X right
+    this.modelPivot.rotation.y = 0;
     this.modelPivot.add(carScene);
 
     this.setupMaterialsAndHierarchy(carScene, envMap);
@@ -135,67 +136,99 @@ export class PlayerVehicle {
           std.envMap = envMap;
 
           if (std.name === 'Paint 1 Carmine' || std.name?.startsWith('Paint 1')) {
-            // Rich, deep Midnight Crimson-Obsidian Metallic Clearcoat (never washed-out coral!)
-            std.color.setRGB(0.14, 0.010, 0.017);
-            std.metalness = 0.88;
-            std.roughness = 0.22;
-            std.envMapIntensity = 1.45;
-            if ('clearcoat' in std) {
-              std.clearcoat = 1.0;
-              std.clearcoatRoughness = 0.06;
-            }
-          } else if (std.name === 'Paint 2 Carmine' || std.name?.startsWith('Paint 2')) {
-            // Sleek dark Forged Carbon / Satin Gunmetal lower aero diffuser & side skirts
-            std.color.setRGB(0.035, 0.038, 0.045);
-            std.metalness = 0.72;
-            std.roughness = 0.28;
+            // Deep Rosso-Midnight Metallic Flake Basecoat + Mirror Dielectric Clearcoat (Linear RGB calibrated)
+            std.color.setRGB(0.21, 0.004, 0.009);
+            std.metalness = 0.56;
+            std.roughness = 0.17;
             std.envMapIntensity = 1.25;
             if ('clearcoat' in std) {
-              std.clearcoat = 0.7;
-              std.clearcoatRoughness = 0.08;
+              std.clearcoat = 1.0;
+              std.clearcoatRoughness = 0.022;
             }
+          } else if (std.name === 'Paint 2 Carbon' || std.name?.startsWith('Paint 2')) {
+            // Deep stealth 2x2 Twill Carbon-Fiber weave + tangent normal map
+            std.color.setRGB(0.18, 0.20, 0.23);
+            std.metalness = 0.18;
+            std.roughness = 0.25;
+            std.envMapIntensity = 0.78;
+            if ('clearcoat' in std) {
+              std.clearcoat = 0.88;
+              std.clearcoatRoughness = 0.065;
+            }
+          } else if (std.name === 'MatteUnderbody') {
+            std.color.setRGB(0.003, 0.003, 0.004);
+            std.metalness = 0.06;
+            std.roughness = 0.94;
+            std.envMapIntensity = 0.10;
           } else if (std.name === 'Tireside' || std.name === 'Tiretread') {
-            // Pure unbranded dark wet performance rubber (removes sample white tire sidewall text!)
-            std.map = null;
-            std.color.setRGB(0.022, 0.024, 0.028);
-            std.metalness = 0.05;
-            std.roughness = 0.62;
-            std.envMapIntensity = 0.75;
-            std.needsUpdate = true;
+            // Grooved wet UHP performance rubber
+            std.color.setRGB(0.014, 0.016, 0.019);
+            std.metalness = 0.04;
+            std.roughness = 0.48;
+            std.envMapIntensity = 0.85;
           } else if (std.name === 'Glass') {
-            std.envMapIntensity = 2.15;
-            std.roughness = 0.03;
-            if ('transmission' in std) {
-              std.transmission = 0.35;
+            std.envMapIntensity = 2.25;
+            std.roughness = 0.025;
+            std.transparent = true;
+            std.opacity = 0.84;
+            if ('clearcoat' in std) {
+              std.clearcoat = 1.0;
+              std.clearcoatRoughness = 0.015;
             }
-            std.color.setHex(0x060a10);
+            std.color.setHex(0x050910);
+          } else if (std.name === 'LensGlass') {
+            std.envMapIntensity = 2.4;
+            std.roughness = 0.02;
+            std.transparent = true;
+            std.opacity = 0.30;
+            if ('clearcoat' in std) {
+              std.clearcoat = 1.0;
+              std.clearcoatRoughness = 0.01;
+            }
+          } else if (std.name === 'MirrorGlass') {
+            std.color.setHex(0xeaf2ff);
+            std.metalness = 1.0;
+            std.roughness = 0.02;
+            std.envMapIntensity = 2.2;
           } else if (std.name === 'Brakelight') {
-            // Razor-sharp glowing ruby LED tail-light blades!
+            // Razor-sharp glowing ruby LED horizon & twin-fin tail-light blades!
             std.color.setHex(0x220002);
             std.emissive = new THREE.Color(0xff0d1a);
-            std.emissiveIntensity = 9.5;
+            std.emissiveIntensity = 10.5;
             if (!this.brakeLightMats.includes(std)) {
               this.brakeLightMats.push(std);
             }
           } else if (std.name === 'Signallight') {
             std.emissive = new THREE.Color(0xff5500);
-            std.emissiveIntensity = 2.2;
+            std.emissiveIntensity = 2.6;
           } else if (std.name === 'Headlight') {
             std.emissive = new THREE.Color(0xdbeeff);
-            std.emissiveIntensity = 8.5;
+            std.emissiveIntensity = 9.5;
           } else if (std.name === 'Disc') {
             std.emissive = new THREE.Color(0xff3b0a);
             std.emissiveIntensity = 0.0;
+            std.envMapIntensity = 1.35;
             if (!this.brakeDiscMats.includes(std)) {
               this.brakeDiscMats.push(std);
             }
           } else if (std.name?.includes('Rim')) {
-            std.color.setRGB(0.58, 0.62, 0.68);
-            std.envMapIntensity = 1.65;
-            std.metalness = 0.94;
-            std.roughness = 0.16;
+            // Forged Satin-Titanium Gunmetal Rims (Linear RGB calibrated so spokes read machined gunmetal, not chalky white!)
+            std.color.setRGB(0.095, 0.105, 0.125);
+            std.envMapIntensity = 1.42;
+            std.metalness = 0.92;
+            std.roughness = 0.18;
+          } else if (std.name === 'TitaniumExhaust') {
+            std.color.setRGB(0.32, 0.30, 0.38);
+            std.envMapIntensity = 1.75;
+            std.metalness = 0.96;
+            std.roughness = 0.14;
+          } else if (std.name === 'CaliperCrimson') {
+            std.color.setRGB(0.42, 0.010, 0.016);
+            std.metalness = 0.78;
+            std.roughness = 0.18;
+            std.envMapIntensity = 1.45;
           } else {
-            std.envMapIntensity = 1.05;
+            std.envMapIntensity = 1.10;
           }
         }
       }
@@ -246,9 +279,9 @@ export class PlayerVehicle {
   }
 
   private setupVehicleLightsAndExhaust(): void {
-    for (const sx of [-0.68, 0.68]) {
+    for (const sx of [-0.67, 0.67]) {
       const spot = new THREE.SpotLight(0xdcecff, 95, 145, Math.PI * 0.21, 0.58, 1.32);
-      spot.position.set(sx, 0.68, -2.18);
+      spot.position.set(sx, 0.49, -1.90);
       spot.target.position.set(sx * 0.85, 0.05, -38.0);
       spot.castShadow = false;
       this.chassisTiltGroup.add(spot);
@@ -290,27 +323,27 @@ export class PlayerVehicle {
         `,
       });
       const beamMesh = new THREE.Mesh(coneGeo, coneMat);
-      beamMesh.position.set(sx, 0.64, -2.22);
-      beamMesh.rotation.x = -0.032;
+      beamMesh.position.set(sx, 0.49, -1.94);
+      beamMesh.rotation.x = -0.030;
       this.chassisTiltGroup.add(beamMesh);
     }
 
-    // Positioned low beneath diffuser so it paints the wet road crimson WITHOUT creating a white dot on the rear bumper!
-    this.brakePointLight = new THREE.PointLight(0xff0e1e, 1.15, 7.5, 1.85);
-    this.brakePointLight.position.set(0, 0.14, 2.52);
+    // Positioned low beneath Venturi diffuser so it paints the wet road crimson!
+    this.brakePointLight = new THREE.PointLight(0xff0e1e, 1.45, 8.0, 1.80);
+    this.brakePointLight.position.set(0, 0.18, 2.52);
     this.chassisTiltGroup.add(this.brakePointLight);
 
-    // Custom Twin Shock-Diamond Plasma Exhaust Plumes
-    this.nitroPointLight = new THREE.PointLight(0x3898ff, 0.0, 12.0, 1.65);
-    this.nitroPointLight.position.set(0, 0.36, 2.85);
+    // Custom Twin Shock-Diamond Plasma Exhaust Plumes aligned with high-mount burnt-titanium canons (x = +-0.36, y = 0.46, z = 2.20)
+    this.nitroPointLight = new THREE.PointLight(0x3898ff, 0.0, 12.5, 1.65);
+    this.nitroPointLight.position.set(0, 0.46, 2.86);
     this.chassisTiltGroup.add(this.nitroPointLight);
 
-    const flameGeo = new THREE.CylinderGeometry(0.045, 0.115, 1.55, 16, 8, true);
-    flameGeo.translate(0, -0.775, 0);
+    const flameGeo = new THREE.CylinderGeometry(0.048, 0.118, 1.60, 16, 8, true);
+    flameGeo.translate(0, -0.80, 0);
     flameGeo.rotateX(-Math.PI * 0.5);
 
     for (let i = 0; i < 2; i++) {
-      const ex = i === 0 ? -0.44 : 0.44;
+      const ex = i === 0 ? -0.36 : 0.36;
       const mat = new THREE.ShaderMaterial({
         vertexShader: NITRO_FLAME_VERT,
         fragmentShader: NITRO_FLAME_FRAG,
@@ -324,7 +357,7 @@ export class PlayerVehicle {
         },
       });
       const mesh = new THREE.Mesh(flameGeo, mat);
-      mesh.position.set(ex, 0.33, 2.14);
+      mesh.position.set(ex, 0.46, 2.20);
       mesh.visible = false;
       this.chassisTiltGroup.add(mesh);
       this.nitroFlames.push({ mesh, mat });
@@ -516,22 +549,22 @@ export class PlayerVehicle {
     this.chassisTiltGroup.position.y = this.heaveOffset;
     this.chassisTiltGroup.rotation.set(this.pitchAngle, 0, this.rollAngle);
 
-    // 7. Wheels & Steering Wheel
-    const wheelRadius = 0.361;
+    // 7. Wheels & Steering Wheel (native glTF Y-up, -Z forward, +X right)
+    const wheelRadius = 0.360;
     this.wheelSpinAngle += (vForward / wheelRadius) * dt;
-    const visualFrontSteer = -this.steerAngle * 0.44;
+    const visualFrontSteer = -this.steerAngle * 0.46;
 
     for (const w of this.wheels) {
       if (w.isFront) {
-        w.knuckle.rotation.set(0, 0, visualFrontSteer);
+        w.knuckle.rotation.set(0, visualFrontSteer, 0);
       }
       for (const part of w.spinParts) {
-        part.rotation.x = this.wheelSpinAngle;
+        part.rotation.x = -this.wheelSpinAngle;
       }
     }
 
     if (this.steeringWheelNode) {
-      this.steeringWheelNode.rotation.y = this.steerAngle * 1.35;
+      this.steeringWheelNode.rotation.z = -this.steerAngle * 1.45;
     }
 
     // 8. Dynamic Taillight Blades, Brake Glow & Supersonic Shock-Diamond Nitro

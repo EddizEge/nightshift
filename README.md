@@ -6,13 +6,14 @@
 
 ## How this was made
 
-This whole game was written by **Gemini 4 Carbon (High)** running as an agent in **Google Antigravity**, from **one long prompt**, in **about 73 minutes**, with **no human-written code**. The agent chose the stack, wrote every system, pulled in the open-licensed assets, ran the build and tested the game in a real browser on its own.
+This whole game was written by **Gemini 4 Carbon (High)** running as an agent in **Google Antigravity**, from **one long prompt**, in **about 73 minutes** (plus about 55 minutes for the player car), with **no human-written code**. The agent chose the stack, wrote every system, pulled in the open-licensed assets, ran the build and tested the game in a real browser on its own.
 
-- The trailer was captured frame by frame from this exact build (no pre-rendered footage). The driving in the trailer is an autopilot script (`video/record.mjs`), and the two set-piece events were triggered with the game's debug hook; in normal play they also fire on their own.
-- The same prompt is also being given to Claude Fable 5.2 for a side-by-side comparison (not finished yet).
+- The player car was modelled from scratch by Gemini in a second prompt (about 55 minutes), in Blender with a Python script (`scripts/build_player_car.py`); before that the game used a ready-made CC BY model. Known flaw: the driver's door panel does not sit flush with the body.
+- The trailer was captured frame by frame from the first build, before the custom car (no pre-rendered footage). The driving in the trailer is an autopilot script (`video/record.mjs`), and the two set-piece events were triggered with the game's debug hook; in normal play they also fire on their own.
+- The same prompt was given to Claude Fable 5.2 for a side-by-side comparison: <https://lab.edizegemercan.com/posts/nightshift-gemini-4-carbon-vs-claude-fable-5-2/> (Fable's version: <https://github.com/EddizEge/nightshift-fable>).
 - Added afterwards, not part of Gemini's output: the `video/` folder (trailer capture and editing tools, written by Claude), the GitHub Pages workflow (`.github/workflows/pages.yml`), the `LICENSE` file and this "How this was made" section.
 
-**License:** Code: MIT (see `LICENSE`). Assets: see `ASSETS.md` (CC BY 4.0 / CC0). Everything else (game code, assets pipeline, tests, the rest of this README, `ASSETS.md`) is Gemini's work as delivered.
+**License:** Code: MIT (see `LICENSE`). Assets: see `ASSETS.md` (CC0). Everything else (game code, assets pipeline, tests, the rest of this README, `ASSETS.md`) is Gemini's work as delivered.
 
 `NIGHTSHIFT` drops you behind the wheel of a twin-turbo midnight supercar tearing down a rain-drenched urban expressway. Slice past heavy traffic for Near-Miss multipliers, blast through Harbor Tunnel sectors, engage Nitro afterburners, and survive real-time multi-vehicle fuel tanker pileups and collapsing highway gantries.
 
@@ -20,7 +21,7 @@ This whole game was written by **Gemini 4 Carbon (High)** running as an agent in
 
 ## Key Technical Highlights
 
-- **High-Fidelity Unbranded Supercar (`player_car.glb`):** Studio-grade PBR clearcoat metallic flake paint (`KHR_materials_clearcoat`), physical dark-tinted glass, independent 4-wheel steering knuckles, fixed brake calipers, glowing hot rotors under heavy braking, spinning multi-spoke rims, dual Xenon SpotLight beams with volumetric rain cones, dynamic crimson brake flares, and plasma-blue Nitro exhaust cones.
+- **100% Original Hero Supercar (`player_car.glb` via `scripts/build_player_car.py`):** Custom-sculpted in headless Blender 4.3 with pure-quad Catmull-Clark Subdivision Surface (`SUBSURF`) multi-panel bodywork, recessed 3D shut-lines, clearcoat metallic flake paint (`KHR_materials_clearcoat`), procedural 2×2 twill carbon-fiber aero package, flush recessed cheekbone-DRL / bi-LED headlamps, continuous teardrop glass canopy, V12 showcase bay, swan-neck GT wing, curved 3D ruby taillight horizon & chevron blades, independent 4-wheel steering knuckles, stationary 6-piston crimson calipers, glowing hot slotted rotors, spinning 5-twin-Y-spoke forged center-lock rims, dual Xenon SpotLight beams, and twin high-mount shock-diamond Nitro plasma canons.
 - **Wet Asphalt & Real-Time Planar Reflections (`WetRoadReflector` + `WetAsphaltMaterial`):**
   - Half-resolution HDR `HalfFloatType` planar reflection pass mirrored across the highway plane (`y = 0`) with oblique near-plane clipping.
   - Scanned Poly Haven PBR asphalt maps sampled seamlessly in world space (`uWorldZOffset` floating-origin support) with multi-octave FBM puddle masking, tire-rut wear tracks, concentric animated raindrop ripples, retro-reflective cat's-eye road studs, and roughness-driven anisotropic reflection streaking.
@@ -128,12 +129,12 @@ Measured on **Windows 11 • AMD Ryzen 7 5700X • NVIDIA GeForce RTX 4060 Ti (D
 
 | Quality Preset / Scenario | Resolution | Planar Reflection | MSAA + Bloom | Measured FPS | Avg Frame Time | Draw Calls |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **LOW** (Open Wet Highway) | `1920×1080` | Disabled (EnvMap fallback) | Off / Minimal | **~121–142 FPS** | `7.1–8.3 ms` | `~956` |
-| **MEDIUM** (Open Wet Highway) | `1920×1080` | `0.35×` Half-Float HDR | `2×` MSAA + Bloom | **~68–81 FPS** | `12.4–14.8 ms` | `~2,014` |
-| **HIGH** (Traffic + Rain + Puddles) | `1920×1080` | `0.50×` Half-Float HDR | `4×` MSAA + Bloom | **~74–80 FPS** | `12.5–13.5 ms` | `~1,928` |
-| **ULTRA** (Nitro + Action Cam) | `1920×1080` | `0.65×` Half-Float HDR | `4×` MSAA + Bloom | **~85–90 FPS** | `11.1–11.7 ms` | `~1,896` |
-| **ULTRA** (Harbor Tunnel Sector) | `1920×1080` | `0.65×` Half-Float HDR | `4×` MSAA + Bloom | **~121–139 FPS** | `7.2–8.2 ms` | `~930–1,034` |
-| **ULTRA** (Event A Tanker Explosion) | `1920×1080` | `0.65×` Half-Float HDR | `4×` MSAA + Bloom | **~85–90 FPS** | `11.1–11.7 ms` | `~1,774` |
+| **LOW** (Open Wet Highway) | `1920×1080` | Disabled (EnvMap fallback) | Off / Minimal | **~149–198 FPS** | `5.1–6.7 ms` | `~392–420` |
+| **MEDIUM** (Open Wet Highway) | `1920×1080` | `0.35×` Half-Float HDR | `2×` MSAA + Bloom | **~117–144 FPS** | `7.0–8.5 ms` | `~869–871` |
+| **HIGH** (Traffic + Rain + Puddles) | `1920×1080` | `0.50×` Half-Float HDR | `4×` MSAA + Bloom | **~100–106 FPS** | `9.4–10.0 ms` | `~824–828` |
+| **ULTRA** (Nitro + Action Cam) | `1920×1080` | `0.65×` Half-Float HDR | `4×` MSAA + Bloom | **~113–122 FPS** | `8.2–8.9 ms` | `~701–755` |
+| **ULTRA** (Harbor Tunnel Sector) | `1920×1080` | `0.65×` Half-Float HDR | `4×` MSAA + Bloom | **~174–189 FPS** | `5.3–5.7 ms` | `~373–375` |
+| **ULTRA** (Event A Tanker Explosion) | `1920×1080` | `0.65×` Half-Float HDR | `4×` MSAA + Bloom | **~101–110 FPS** | `9.1–9.9 ms` | `~809–1,031` |
 
 > **Dynamic Resolution Scaling (DRS):** Enabled by default (`Settings → Dynamic Resolution`), automatically scaling internal render resolution down toward `0.65×` on integrated/mobile GPUs if frame times exceed `18 ms`, and restoring `1.0×` native sharpness when headroom returns.
 
@@ -172,4 +173,4 @@ src/
 
 ## Asset Licensing
 
-See [ASSETS.md](./ASSETS.md) for complete source URLs, **CC BY 4.0** attribution (`CarConcept` by Eric Chadwick / Darmstadt Graphics Group GmbH via Khronos Group), and **CC0** documentation (Poly Haven HDRI/PBR scans & original project traffic models).
+See [ASSETS.md](./ASSETS.md) for complete **CC0 1.0** asset documentation: both the hero supercar (`player_car.glb`, generated from scratch via `scripts/build_player_car.py`) and the 4-type highway traffic fleet (`scripts/build_assets.py`) are **100% original Blender-authored project models** with zero third-party vehicle meshes or brand trademarks, paired with **CC0** Poly Haven HDRI/PBR surface scans and real-time Web Audio synthesis.

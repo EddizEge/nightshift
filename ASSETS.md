@@ -6,16 +6,10 @@ All 3D models, HDRI lighting environments, PBR surface textures, shaders, and au
 
 ## 1. 3D Vehicle Models (`public/assets/models/`)
 
-### `player_car.glb` — Hero Midnight Sports Concept Car
-- **Upstream Asset:** `CarConcept` from the official **Khronos Group `glTF-Sample-Assets`** repository  
-  (`https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept`)
-- **Original Base Geometry:** Derived from *Free Concept Car 004 - Public Domain CC0* by **Unity Fan** (`CC0 1.0`).
-- **glTF Mastering, UV Cleanup & PBR Clearcoat Materials:** **Eric Chadwick** / **Darmstadt Graphics Group GmbH** (© 2024).
-- **License:** **Creative Commons Attribution 4.0 International (`CC BY 4.0`)**  
-  (`https://creativecommons.org/licenses/by/4.0/`) — permits commercial use, redistribution, and adaptation with attribution.
-- **Project Adaptations (`scripts/prepare_player_car.mjs`):**
-  - Reset showcase-angled wheel transforms (`WheelFrontL`, `WheelFrontR`, `WheelRearL`, `WheelRearR`) to straight-ahead pivots for real-time steering (`rotation.z`) and axle spin (`rotation.x`).
-  - Removed Khronos sample logo/plate textures from `Panel Sides` and `License` materials to create an unbranded dark carbon/gunmetal finish (avoiding any trademark usage).
+### `player_car.glb` — Original Hero Supercar (*NIGHTSHIFT V12 GT*)
+- **Author:** 100% original procedural Catmull-Clark Subdivision Surface (`SUBSURF`) & PBR Clearcoat 3D model (`89,900` triangles, `46,917` vertices, `2.48 MB` `.glb`) generated from scratch for **NIGHTSHIFT** via `scripts/build_player_car.py` (Blender 4.3 headless Python pipeline).
+- **Geometry & Features:** Multi-panel Class-A exterior body with recessed 3D shut-lines (separate front bumper fascia with tucked carbon radiator splitters, sculpted vented bonnet, radial-lofted flared front fenders, widebody rear haunches with scooped mid-engine intakes, separate left/right aerodynamic doors, gloss-black A-pillar mirror gussets, twin-stalk wing mirrors, continuous teardrop tinted glass canopy, double-bubble 2×2 twill carbon roof, painted engine decklid shoulders + smoked-glass V12 spine window with plenum & crimson strut X-brace, top-mounted swan-neck GT rear wing, 6-strake carbon Venturi diffuser, high-mount dual-wall hollow burnt-titanium exhaust canons), flush recessed cheekbone-DRL / bi-LED headlamps, curved 3D ruby horizon & chevron LED taillight blades, cockpit interior with live-turning flat-bottom steering wheel, and staggered 20"/21" 5-twin-Y-spoke forged gunmetal center-lock wheels (`WheelFrontL/R`, `WheelRearL/R`) with grooved UHP tires, slotted carbon-ceramic rotors, and stationary 6-piston crimson calipers.
+- **License:** **CC0 1.0 Universal (Public Domain Dedication)** — 100% original project-authored geometry, UVs, and procedural micro-detail textures; zero third-party meshes or trademarks; unrestricted commercial use and redistribution.
 
 ### `traffic_sedan.glb`, `traffic_suv.glb`, `traffic_truck.glb`, `traffic_tanker.glb` — Highway Traffic Fleet
 - **Author:** Original procedural Catmull-Clark Subdivision Surface & PBR Clearcoat 3D assets generated specifically for **NIGHTSHIFT** via `scripts/build_assets.py` (Blender 4.3 headless Python pipeline).

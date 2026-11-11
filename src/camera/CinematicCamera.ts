@@ -53,24 +53,27 @@ export class CinematicCamera {
     this.camera.updateProjectionMatrix();
   }
 
+  public setMenuOrbitAngle(angle: number): void {
+    this.menuOrbitAngle = angle;
+  }
+
   /**
    * Dramatic low-angle showcase camera for the Main Menu: slowly sweeps around the wet supercar
-   * showing off its clearcoat reflections, xenon headlights in falling rain, and glistening puddles.
+   * from rear-three-quarter (taillight horizon & active wing) to front-three-quarter (xenon headlamps & splitter).
    */
   public updateMenuShowcase(dt: number, time: number, player: PlayerVehicle): void {
     this.menuOrbitAngle += dt * 0.16;
-    // Gentle figure-8 / front-three-quarter to rear-three-quarter cinema sweep inside highway bounds
-    const sweep = Math.sin(this.menuOrbitAngle) * 0.85 + 0.55; // radians around car
-    const radius = 5.25 + Math.cos(this.menuOrbitAngle * 0.7) * 0.55;
-    const height = 1.22 + Math.sin(time * 0.45) * 0.18;
+    const sweep = Math.sin(this.menuOrbitAngle) * 1.05 + 1.28; // sweeps 0.23 rad (rear 3/4) <-> 2.33 rad (front 3/4)
+    const radius = 5.05 + Math.cos(this.menuOrbitAngle * 0.7) * 0.45;
+    const height = 1.18 + Math.sin(time * 0.45) * 0.14;
 
     const tx = THREE.MathUtils.clamp(player.position.x + Math.sin(sweep) * radius, -8.8, 8.8);
     const tz = player.position.z + Math.cos(sweep) * radius;
 
     this.camera.position.set(tx, height, tz);
-    this.camera.lookAt(player.position.x, 0.68, player.position.z - 0.55);
-    if (Math.abs(this.camera.fov - 46) > 0.1) {
-      this.camera.fov = THREE.MathUtils.lerp(this.camera.fov, 46, 1.0 - Math.exp(-4 * dt));
+    this.camera.lookAt(player.position.x, 0.62, player.position.z - 0.15);
+    if (Math.abs(this.camera.fov - 45) > 0.1) {
+      this.camera.fov = THREE.MathUtils.lerp(this.camera.fov, 45, 1.0 - Math.exp(-4 * dt));
       this.camera.updateProjectionMatrix();
     }
   }
@@ -91,9 +94,9 @@ export class CinematicCamera {
     const rightZ = -sinH;
 
     if (this.mode === 'HOOD') {
-      // Rigidly mounted Exterior Bonnet / Hood Camera (zero world-space lerp lag at 250+ km/h!)
-      const hoodFwd = 1.46;
-      const hoodUp = 0.98 + player.heaveOffset;
+      // Rigidly mounted Exterior Bonnet / Hood Camera showing sculpted power-hood & muscular GT front fenders!
+      const hoodFwd = 0.86;
+      const hoodUp = 0.94 + player.heaveOffset;
       this.desiredPos.set(
         player.position.x + fwdX * hoodFwd,
         player.position.y + hoodUp,
@@ -101,7 +104,7 @@ export class CinematicCamera {
       );
       this.desiredLook.set(
         player.position.x + fwdX * 44.0 + rightX * (player.steerAngle * 2.4),
-        0.82 + player.heaveOffset * 0.5,
+        0.64 + player.heaveOffset * 0.5,
         player.position.z + fwdZ * 44.0 + rightZ * (player.steerAngle * 2.4),
       );
       this.currentPos.copy(this.desiredPos);

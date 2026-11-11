@@ -678,6 +678,7 @@ export class NightshiftGame {
         this.highway.update(this.player.position.z, this.clockTime);
         this.camController.snapBehindPlayer(this.player);
       },
+      setMenuOrbitAngle: (rad: number) => this.camController.setMenuOrbitAngle(rad),
       forceCrash: () => this.triggerFatalCrashSequence('HIGH-SPEED COLLISION // SIMULATION TEST'),
     };
   }

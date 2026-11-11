@@ -112,10 +112,16 @@ async function runVerification() {
   });
   console.log('GPU Info:', gpuInfo);
 
-  // 1. Main Menu Showcase
-  await page.waitForTimeout(1500);
+  // 1. Main Menu Showcase (Rear-Three-Quarter + Front-Three-Quarter Hero Angles)
+  await page.evaluate(() => window.__NIGHTSHIFT_DEBUG__.setMenuOrbitAngle(-0.45));
+  await page.waitForTimeout(250);
   await page.screenshot({ path: path.join(SCREENSHOT_DIR, '01_main_menu_showcase.png') });
   console.log('Captured 01_main_menu_showcase.png');
+
+  await page.evaluate(() => window.__NIGHTSHIFT_DEBUG__.setMenuOrbitAngle(1.25));
+  await page.waitForTimeout(250);
+  await page.screenshot({ path: path.join(SCREENSHOT_DIR, '01b_front_three_quarter.png') });
+  console.log('Captured 01b_front_three_quarter.png');
 
   // 2. Settings Modal -> Enable Telemetry & Test HIGH first, then ULTRA
   await page.click('#btn-settings');

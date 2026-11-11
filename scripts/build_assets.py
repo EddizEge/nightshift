@@ -1,11 +1,11 @@
 """
-NIGHTSHIFT 3D Vehicle Asset Pipeline (Blender 4.3 Headless)
-1. Cleans, unbrands, straightens wheels, and WebP-compresses Khronos CarConcept.glb -> public/assets/models/player_car.glb (CC BY 4.0)
-2. Generates smooth Catmull-Clark Subdivision Surface / Beveled high-detail PBR traffic vehicles (CC0):
+NIGHTSHIFT 3D Traffic Asset Pipeline (Blender 4.3 Headless)
+Generates smooth Catmull-Clark Subdivision Surface / Beveled high-detail PBR traffic vehicles (CC0):
    - public/assets/models/traffic_sedan.glb
    - public/assets/models/traffic_suv.glb
    - public/assets/models/traffic_truck.glb
    - public/assets/models/traffic_tanker.glb
+(Hero player car is generated separately from scratch by scripts/build_player_car.py)
 """
 
 import bpy
@@ -14,7 +14,6 @@ import math
 import os
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-RAW_CAR = os.path.join(ROOT, "raw_cache", "CarConcept_raw.glb")
 OUT_DIR = os.path.join(ROOT, "public", "assets", "models")
 os.makedirs(OUT_DIR, exist_ok=True)
 
@@ -40,63 +39,6 @@ def make_pbr_mat(name, base_color, metallic=0.0, roughness=0.4, emission=None, e
         bsdf.inputs["Alpha"].default_value = alpha
         mat.blend_method = 'BLEND' if hasattr(mat, 'blend_method') else 'HASHED'
     return mat
-
-
-def process_player_car():
-    print("=== Processing Hero Player Car (CarConcept -> player_car.glb) ===")
-    clear_scene()
-    bpy.ops.import_scene.gltf(filepath=RAW_CAR)
-
-    # Straighten showcase-angled wheels to exact zero rotation while preserving translations
-    wheel_names = ["WheelFrontL", "WheelFrontR", "WheelRearL", "WheelRearR"]
-    for obj in bpy.data.objects:
-        for wn in wheel_names:
-            if obj.name == wn or obj.name.startswith(wn + "."):
-                obj.rotation_mode = 'QUATERNION'
-                obj.rotation_quaternion = (1.0, 0.0, 0.0, 0.0)
-                print(f"  Reset wheel rotation: {obj.name} at loc={tuple(round(v, 3) for v in obj.location)}")
-
-    # Unbrand license plate & side panel decals for 100% clean unbranded sports car aesthetic
-    for mat in bpy.data.materials:
-        if mat.name in ("License", "Panel Sides"):
-            mat.use_nodes = True
-            nodes = mat.node_tree.nodes
-            links = mat.node_tree.links
-            bsdf = nodes.get("Principled BSDF")
-            if bsdf:
-                # Disconnect base color textures (Khronos sample plate/logo) and replace with sleek carbon/gunmetal finish
-                for inp_name in ("Base Color", "Normal"):
-                    inp = bsdf.inputs.get(inp_name)
-                    if inp and inp.is_linked:
-                        for lnk in list(inp.links):
-                            links.remove(lnk)
-                bsdf.inputs["Base Color"].default_value = (0.035, 0.038, 0.045, 1.0)
-                bsdf.inputs["Metallic"].default_value = 0.65
-                bsdf.inputs["Roughness"].default_value = 0.25
-                if "Coat Weight" in bsdf.inputs:
-                    bsdf.inputs["Coat Weight"].default_value = 0.9
-                    bsdf.inputs["Coat Roughness"].default_value = 0.06
-
-    # Downscale any textures > 1024px so web bundle stays compact & GPU upload is instant
-    for img in bpy.data.images:
-        if img.size[0] > 1024 or img.size[1] > 1024:
-            w = min(img.size[0], 1024)
-            h = min(img.size[1], 1024)
-            img.scale(w, h)
-            print(f"  Scaled image {img.name}: {w}x{h}")
-
-    out_path = os.path.join(OUT_DIR, "player_car.glb")
-    bpy.ops.export_scene.gltf(
-        filepath=out_path,
-        export_format='GLB',
-        export_image_format='WEBP',
-        export_image_quality=86,
-        export_yup=True,
-        export_apply=False,
-        export_lights=False,
-        export_cameras=False,
-    )
-    print(f"Exported {out_path} ({os.path.getsize(out_path):,} bytes)")
 
 
 def create_alloy_wheel(name, radius, width, spokes=7, mat_tire=None, mat_rim=None, mat_disc=None):
