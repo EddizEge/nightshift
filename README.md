@@ -6,9 +6,9 @@
 
 ## How this was made
 
-This whole game was written by **Gemini 4 Carbon (High)** running as an agent in **Google Antigravity**, from **one long prompt**, in **about 73 minutes** (plus about 55 minutes for the player car), with **no human-written code**. The agent chose the stack, wrote every system, pulled in the open-licensed assets, ran the build and tested the game in a real browser on its own.
+This whole game was written by **Gemini 4 Carbon (High)** running as an agent in **Google Antigravity**, from **one long prompt**, in **about 2 h 8 min** in total, with **no human-written code**. The agent chose the stack, wrote every system, pulled in the open-licensed assets, ran the build and tested the game in a real browser on its own.
 
-- The player car was modelled from scratch by Gemini in a second prompt (about 55 minutes), in Blender with a Python script (`scripts/build_player_car.py`); before that the game used a ready-made CC BY model. Known flaw: the driver's door panel does not sit flush with the body.
+- The player car was modelled from scratch by Gemini in Blender with a Python script (`scripts/build_player_car.py`). Known flaw: the driver's door panel does not sit flush with the body.
 - The trailer was captured frame by frame from the first build, before the custom car (no pre-rendered footage). The driving in the trailer is an autopilot script (`video/record.mjs`), and the two set-piece events were triggered with the game's debug hook; in normal play they also fire on their own.
 - The same prompt was given to Claude Fable 5.2 for a side-by-side comparison: <https://lab.edizegemercan.com/posts/nightshift-gemini-4-carbon-vs-claude-fable-5-2/> (Fable's version: <https://github.com/EddizEge/nightshift-fable>).
 - Added afterwards, not part of Gemini's output: the `video/` folder (trailer capture and editing tools, written by Claude), the GitHub Pages workflow (`.github/workflows/pages.yml`), the `LICENSE` file and this "How this was made" section.
